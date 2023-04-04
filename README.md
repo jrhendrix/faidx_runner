@@ -30,13 +30,22 @@ group_1 ID_1  ID_2  ... ID_n
 group_2 ID_A  ID_B  ... ID_n
 ```
 
-Where `group` is a unique identifier used to label the output file that contains the extracted sequences.  the group of sequences in the output for the group of sequence IDs. The output file of sequences will be  for the set of identifiers on that line. Ensure that after the group name and between each ID is a tab. For example, the output file group_1.fasta will contain the sequences for ID_1, ID_2, ... ID_n. There is no limit to the number of rows or columns within the text file. 
+Where `group` is a unique identifier used to label the output file that contains the extracted sequences.  the group of sequences in the output for the group of sequence IDs. The output file of sequences will be  for the set of identifiers on that line. Ensure that after the group name and between each ID is a tab. For example, the output file group_1.fasta will contain the sequences for ID_1, ID_2, ... ID_n. There is no limit to the number of rows or columns within the text file.
+
+### Query by gene name
+As input, this mode requires a Prokka generated .tsv file that describes the genes to parse. 
+```
+python runFaidx.py gene -g genename -f file.fasta -i prokka.tsv
+```
+runFaidx.py offers three modes for finding the genes of interst that can be specified using the `-m` flag. `exact` requires an exact match. `gene` mode will match only the prefix of the gene. `close` will grab any gene that contains the given string.
+
+Let a genome contain the genes esxA_1, esxA_2, and esxH. Running runFaidx.py with the parameters `-g esxA_1 -m exact` will extract the sequence for esxA_1. Using the parameters `-g esxA -m gene` will extract the sequences for esxA_1 and esxA_2. Running with the parameters `-g esx -m close` will export the sequences for all three genes.
 
 ### Query by Roary output
 Roary outputs a file called gene_presence_absence.csv. This file can contain a subset of the rows in the original file; however, it must contain all of the original columns and be comma deliminated. The first column (named Gene) contains a unique identifier that is used to label the output file for the extracted sequences.
 
 ```
-python runFaidx.py roary -f file.fasta -l gene_presence_absence.csv
+python runFaidx.py roary -f file.fasta -i gene_presence_absence.csv
 ```
 
 ### Pangenome mode
