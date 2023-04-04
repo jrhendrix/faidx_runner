@@ -126,12 +126,10 @@ def get_keys_from_gene_name(args, ifile):
 	'''
 
 	keys = []
-	#f = open(ifile.path, 'r')
 
 	gene = args.gene
 
 	# LOOP THROUGH GENE NAMES
-	#for gene in phrases:
 	command = ['grep', gene, ifile.path]
 	process = subprocess.Popen(command, shell=False, stdout=subprocess.PIPE)
 	result = process.stdout.readlines()
@@ -166,8 +164,6 @@ def get_keys_from_gene_name(args, ifile):
 def get_keys_from_table(args, ifile, suffix):
 
 	f = open(ifile.path, 'r')
-	#suffix = ars.fasta.extension
-	#keys = []
 	next(f) # skip header line
 	for line in f:
 		keys = []
@@ -179,30 +175,57 @@ def get_keys_from_table(args, ifile, suffix):
 		extract_seqs(args, keys, suffix, fname)
 	return
 
-
-
-
-def get_keys_from_roary(args, ifile):
-
+def get_keys_from_roary(args, ifile, suffix):
 	f = open(ifile.path, 'r')
-	#keys = []
-	accKeys = []
-	coreKeys = []
-	n = args.num_samps
+
 	next(f) # Skip header line
 	for line in f:
-		l = line.split(',')[14:][:n]
+		l = line.split(',')
+		fname = l[0].strip('"')
+		print('\n')
+		try:
+			keyList = l[14:]
+		except:
+			continue
+
+		print(keyList)
+		# REMOVE EMPTY ELEMENTS
+		keys = []
+		for e in keyList:
+			e = e.strip('"')
+			if ' ' in e or ':' in e:
+				continue
+			if e:
+				keys.append(e)
+
+		# EXTRACT SEQUENCES
+		extract_seqs(args, keys, suffix, fname)
+	return
+
+
+def get_keys_for_pangenome(args, ifile):
+
+	f = open(ifile.path, 'r')
+	accKeys = []
+	coreKeys = []
+	next(f) # Skip header line
+	for line in f:
+		try:
+			l = line.split(',')[14:]
+			l.pop(-1)
+		except:
+			continue
 
 		# REMOVE EMPTY ELEMENTS
 		myIDs = []
+		n = 0
 		for e in l:
 			e = e.strip('"')
+			if ' ' in e or ':' in e:
+				continue
 			if e:
 				myIDs.append(e)
-		# Remove empty elements
-		#myIDs = [i for i in l if i]
-		#print(myIDs)
-
+				n = n + 1
 
 		if len(myIDs) == n:
 			coreKeys.append(myIDs[0])
@@ -210,14 +233,6 @@ def get_keys_from_roary(args, ifile):
 			accKeys.append(myIDs[0])
 		else:
 			print('ERROR: Something went wrong.')
-			
-
-		#for e in l:
-		
-		#	if e != '""':
-		#		keys.append(e)
-		#		break
-		
 		
 	f.close()
 
@@ -247,8 +262,8 @@ def extract_seqs(args, keys, suffix, tag=None):
 		# preserves origin of data
 		# preserves data type in extension
 
-	TOP_DIR = Dir(args.p)
-	OUTDIR = TOP_DIR.make_subdir(args.o)
+	TOP_DIR = Dir(args.output_path)
+	OUTDIR = TOP_DIR.make_subdir(args.output_directory)
 
 	
 	if tag is not None:
@@ -257,11 +272,6 @@ def extract_seqs(args, keys, suffix, tag=None):
 		outname = args.savename
 	outname = '.'.join((outname, suffix))
 	outfile = '/'.join((OUTDIR.path, outname))
-	#outname = ''.join((outname))
-	#outfile = ('subset', tag)
-	#outfile = '_'.join(outfile)
-	#outfile = (outfile, args.fasta)
-	#outfile = '_'.join(outfile)
 
 	try:
 		f = open(outfile, 'w')
@@ -284,6 +294,8 @@ def extract_seqs(args, keys, suffix, tag=None):
 		#	print('stuff enough')
 			#entry = entry.strip()
 		entry = ''.join((entry, '\n'))
+		if entry == '>\n':
+			continue
 		f.write(entry)
 		#else:
 		#	print(entry)
@@ -300,19 +312,21 @@ def main(program):
 	cwd = os.getcwd()
 
 	# PARSER : ROOT
-	parent_parser = argparse.ArgumentParser(prog='run_samtools', add_help=False)
+	parent_parser = argparse.ArgumentParser(prog='run_faidx', add_help=False)
 	parent_parser.add_argument('-f', '--fasta', help='FASTA file of sequences (required)')
 	parent_parser.add_argument('-i', '--input_file', help='Path to input file.')
 	#parent_parser.add_argument('-k', '--keys', 'List of keys', type=list)
 	#parent_parser.add_argument('-m', '--method', help='Dictate source of keys: file or list', choices=['roary', 'gene'])
-	parent_parser.add_argument('-o', default='subset_faidx', help='Prefix of output directory', type=str)
-	parent_parser.add_argument('-p', default=cwd, help='Path to output', type=str)
+	parent_parser.add_argument('-o', '--output_directory', default='subset_faidx', help='Prefix of output directory', type=str)
+	parent_parser.add_argument('-p', '--output_path', default=cwd, help='Path to output', type=str)
 	parent_parser.add_argument('-s', '--savename', default='subset', help = 'Name for output file.', type=str)
 	parent_parser.add_argument('--version', action='version', version='%(prog)s 0.0.4')
 	subparsers = parent_parser.add_subparsers(help='sub-command help')
 
-	from_roary = subparsers.add_parser('by_roary', help='When using Roary outpt', parents=[parent_parser])
-	from_roary.add_argument('-n', '--num_samps', help='Number of samples to look at.', type = int)
+	from_roary = subparsers.add_parser('roary', help='When using Roary output', parents=[parent_parser])
+	#from_roary.add_argument('-n', '--num_samps', help='Number of samples to look at.', type = int)
+
+	from_pangenome = subparsers.add_parser('pangenome', help='Separate core and accessory sequences', parents=[parent_parser])
 
 	from_gene = subparsers.add_parser('by_gene', help='When using gene names', parents=[parent_parser])
 	from_gene.add_argument('-m', '--match', default='gene', help='Select match level', choices=['exact', 'gene', 'close'])
@@ -320,6 +334,7 @@ def main(program):
 
 	from_file = subparsers.add_parser('by_id', help='When using a file of keys', parents=[parent_parser])
 	from_table = subparsers.add_parser('table', help='When using a table of keys', parents=[parent_parser])
+
 
 	args = parent_parser.parse_args()
 
@@ -331,13 +346,13 @@ def main(program):
 	except:
 		print('ERROR: Could not find input file.')
 
-	if program == 'roary':
-		accKeys, coreKeys = get_keys_from_roary(args, ifile)
+	if program == 'pangenome':
+		accKeys, coreKeys = get_keys_for_pangenome(args, ifile)
 
 		extract_seqs(args, accKeys, suffix, 'access')
 		extract_seqs(args, coreKeys, suffix, 'core')
 
-	elif program == 'gene':
+	elif program == 'by_gene':
 		keys = get_keys_from_gene_name(args, ifile)
 		print(keys)
 		extract_seqs(args, keys, suffix, str(args.gene))
@@ -345,6 +360,9 @@ def main(program):
 	elif program == 'file':
 		keys = get_keys_from_file(args, ifile)
 		extract_seqs(args, keys, suffix, args.o)
+
+	elif program == 'roary':
+		get_keys_from_roary(args, ifile, suffix)
 
 	elif program == 'table':
 		get_keys_from_table(args, ifile, suffix)
