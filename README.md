@@ -48,6 +48,12 @@ Roary outputs a file called gene_presence_absence.csv. This file can contain a s
 python runFaidx.py roary -f file.fasta -i gene_presence_absence.csv
 ```
 
+### Query using a file of IDs
+As input, this mode takes a text file where each line contains a single gene ID.
+```
+python runFaidx.py file -f file.fasta -i file.txt
+```
+
 ### Pangenome mode
 Pangenome mode will use Roary output as its input. This file can contain a subset of the rows in the original file; however, it must contain all of the original columns and be comma deliminated.
 ```
@@ -64,8 +70,3 @@ In this case, `core.fasta` will contain the sequence for g1_ID1 and `access.fast
 ### Runtime specifics
 runFaidx.py will export the sequences to a directory called `subset_faidx`. To change the name of this directory use the `-o` flag. By default, runFaidx.py will create this directory in the current working directory. To change the path, use the `-p ` flag.
 Each exported file will have the prefix `subset` but this can be changed using the `-s` flag.
-
-### Query by ID list
-Coming soon
-
-### Query by gene name
