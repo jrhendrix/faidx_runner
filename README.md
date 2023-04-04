@@ -1,6 +1,6 @@
 # faidx_runner
 
-faidx_runner is a wrapper for the Samtools faidx tool to improve ease of use. 
+runFaidx is a wrapper for the Samtools faidx tool to improve ease of use. 
 
 Faidx extracts a sequence from a fasta file (faa, fna, etc.) using the sequence ID; however, because the command takes a list of sequence IDs, the command becomes unwieldy when extracting a large number of sequences. Further, a new command is required for each grouping of ssequence extracts.
 
@@ -13,12 +13,16 @@ This tool allows users to extract any number of sequences and group the output i
 
 
 ## Usage
-faidx_runner can extract sequences using three modes.
+runFaidx.py can extract sequences using four modes.
+
+runFaidx.py is currently unable to search multiple files for the sequence IDs. If the sequences are present across multiple files, first join the files into one using the `cat` command.
+```cat *faa > all.faa```
+
 
 ### Query by ID table
 Each sequence element in the fasta file should have its own sequence ID.
 ```
-python run_faidx.py table -f file.fasta -i lists.tsv
+python runFaidx.py table -f file.fasta -i lists.tsv
 ```
 The text file is tab deliminated and should have the following format:
 ```
@@ -28,17 +32,18 @@ group_2 ID_A  ID_B  ... ID_n
 
 Where `group` is a unique identifier used to label the output file that contains the extracted sequences.  the group of sequences in the output for the group of sequence IDs. The output file of sequences will be  for the set of identifiers on that line. Ensure that after the group name and between each ID is a tab. For example, the output file group_1.fasta will contain the sequences for ID_1, ID_2, ... ID_n. There is no limit to the number of rows or columns within the text file. 
 
+### Query by Roary output
+Roary outputs a file called gene_presence_absence.csv. This file can contain a subset of the rows in the original file; however, it must contain all of the original columns and be comma deliminated. The first column (named Gene) contains a unique identifier that is used to label the output file for the extracted sequences.
+
+```
+python runFaidx.py roary -f file.fasta -l gene_presence_absence.csv
+```
+
+### Runtime specifics
+runFaidx.py will export the sequences to a directory called `subset_faidx`. To change the name of this directory use the `-o` flag. By default, runFaidx.py will create this directory in the current working directory. To change the path, use the `-p ` flag.
+Each exported file will have the prefix `subset` but this can be changed using the `-s` flag.
 
 ### Query by ID list
 Coming soon
 
 ### Query by gene name
-
-
-### Query by Roary output
-
-
-
-TODO:
-Search multiple files
-Input by_list
