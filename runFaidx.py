@@ -200,6 +200,8 @@ def get_keys_from_roary(args, ifile, suffix):
 
 		# EXTRACT SEQUENCES
 		extract_seqs(args, keys, suffix, fname)
+
+	f.close()
 	return
 
 
@@ -208,7 +210,13 @@ def get_keys_for_pangenome(args, ifile):
 	f = open(ifile.path, 'r')
 	accKeys = []
 	coreKeys = []
-	next(f) # Skip header line
+	#next(f) # Skip header line
+	# GET NUMBER OF SAMPLES
+	header = f.readline()
+	h = header.split(',')[14:]
+	header.pop(-1)
+	numSamps = len(header)
+
 	for line in f:
 		try:
 			l = line.split(',')[14:]
@@ -227,9 +235,9 @@ def get_keys_for_pangenome(args, ifile):
 				myIDs.append(e)
 				n = n + 1
 
-		if len(myIDs) == n:
+		if len(myIDs) == numSamps:
 			coreKeys.append(myIDs[0])
-		elif len(myIDs) < n:
+		elif len(myIDs) < numSamps:
 			accKeys.append(myIDs[0])
 		else:
 			print('ERROR: Something went wrong.')
