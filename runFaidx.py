@@ -182,7 +182,6 @@ def get_keys_from_roary(args, ifile, suffix):
 	for line in f:
 		l = line.split(',')
 		fname = l[0].strip('"')
-		print('\n')
 		try:
 			keyList = l[14:]
 		except:
@@ -289,24 +288,14 @@ def extract_seqs(args, keys, suffix, tag=None):
 
 	# loop through keys and extract corresponding sequence
 	for i in keys:
-		#print(i)
 		cmd = ['samtools', 'faidx', args.fasta, i]
 		process = subprocess.run(cmd, capture_output=True)
-		#print('new entry')
 		entry = process.stdout.decode("utf-8").strip()
-		#print(entry)
-		#seq = entry.split('\n')[1]
-		#print(entry)
-		#if len(seq.strip()) > 0: 
-		#	print('stuff enough')
-			#entry = entry.strip()
+
 		entry = ''.join((entry, '\n'))
 		if entry == '>\n':
 			continue
 		f.write(entry)
-		#else:
-		#	print(entry)
-		#	print(seq)
 
 	f.close()
 
@@ -335,7 +324,7 @@ def main(program):
 
 	from_pangenome = subparsers.add_parser('pangenome', help='Separate core and accessory sequences', parents=[parent_parser])
 
-	from_gene = subparsers.add_parser('by_gene', help='When using gene names', parents=[parent_parser])
+	from_gene = subparsers.add_parser('gene', help='When using gene names', parents=[parent_parser])
 	from_gene.add_argument('-m', '--match', default='gene', help='Select match level', choices=['exact', 'gene', 'close'])
 	from_gene.add_argument('-g', '--gene', help='Gene name to search for.')
 
@@ -359,7 +348,7 @@ def main(program):
 		extract_seqs(args, accKeys, suffix, 'access')
 		extract_seqs(args, coreKeys, suffix, 'core')
 
-	elif program == 'by_gene':
+	elif program == 'gene':
 		keys = get_keys_from_gene_name(args, ifile)
 		print(keys)
 		extract_seqs(args, keys, suffix, str(args.gene))
