@@ -188,7 +188,6 @@ def get_keys_from_roary(args, ifile, suffix):
 		except:
 			continue
 
-		print(keyList)
 		# REMOVE EMPTY ELEMENTS
 		keys = []
 		for e in keyList:
