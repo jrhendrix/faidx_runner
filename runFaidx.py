@@ -311,8 +311,6 @@ def main(program):
 	parent_parser = argparse.ArgumentParser(prog='run_faidx', add_help=False)
 	parent_parser.add_argument('-f', '--fasta', help='FASTA file of sequences (required)')
 	parent_parser.add_argument('-i', '--input_file', help='Path to input file.')
-	#parent_parser.add_argument('-k', '--keys', 'List of keys', type=list)
-	#parent_parser.add_argument('-m', '--method', help='Dictate source of keys: file or list', choices=['roary', 'gene'])
 	parent_parser.add_argument('-o', '--output_directory', default='subset_faidx', help='Prefix of output directory', type=str)
 	parent_parser.add_argument('-p', '--output_path', default=cwd, help='Path to output', type=str)
 	parent_parser.add_argument('-s', '--savename', default='subset', help = 'Name for output file.', type=str)
@@ -320,7 +318,6 @@ def main(program):
 	subparsers = parent_parser.add_subparsers(help='sub-command help')
 
 	from_roary = subparsers.add_parser('roary', help='When using Roary output', parents=[parent_parser])
-	#from_roary.add_argument('-n', '--num_samps', help='Number of samples to look at.', type = int)
 
 	from_pangenome = subparsers.add_parser('pangenome', help='Separate core and accessory sequences', parents=[parent_parser])
 
