@@ -328,7 +328,7 @@ def main(program):
 	from_gene.add_argument('-m', '--match', default='gene', help='Select match level', choices=['exact', 'gene', 'close'])
 	from_gene.add_argument('-g', '--gene', help='Gene name to search for.')
 
-	from_file = subparsers.add_parser('by_id', help='When using a file of keys', parents=[parent_parser])
+	from_file = subparsers.add_parser('file', help='When using a file of keys', parents=[parent_parser])
 	from_table = subparsers.add_parser('table', help='When using a table of keys', parents=[parent_parser])
 
 
@@ -355,7 +355,7 @@ def main(program):
 
 	elif program == 'file':
 		keys = get_keys_from_file(args, ifile)
-		extract_seqs(args, keys, suffix, args.o)
+		extract_seqs(args, keys, suffix)
 
 	elif program == 'roary':
 		get_keys_from_roary(args, ifile, suffix)
