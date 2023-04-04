@@ -210,12 +210,12 @@ def get_keys_for_pangenome(args, ifile):
 	f = open(ifile.path, 'r')
 	accKeys = []
 	coreKeys = []
-	#next(f) # Skip header line
+
 	# GET NUMBER OF SAMPLES
 	header = f.readline()
 	h = header.split(',')[14:]
-	header.pop(-1)
-	numSamps = len(header)
+	h.pop(-1)
+	numSamps = len(h)
 
 	for line in f:
 		try:
