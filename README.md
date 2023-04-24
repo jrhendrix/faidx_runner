@@ -49,7 +49,7 @@ python runFaidx.py roary -f file.fasta -i gene_presence_absence.csv
 ```
 
 ### Query using a file of IDs
-As input, this mode takes a text file where each line contains a single gene ID.
+As input, this mode takes a text file where each line contains a single gene ID. When using this mode, do not include a header line.
 ```
 python runFaidx.py file -f file.fasta -i file.txt
 ```
